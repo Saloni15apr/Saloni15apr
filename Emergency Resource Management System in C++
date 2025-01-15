@@ -1,165 +1,98 @@
 #include <iostream>
-#include <queue>
-#include <map>
 #include <string>
-#include <iomanip>
-
 using namespace std;
-
-struct Request {
-    string areaName;
-    int priority; 
-    int food, water, medical;
-
-    bool operator<(const Request& other) const {
-        return priority > other.priority;
-    }
-};
 
 class ResourceManagementSystem {
 private:
-    map<string, int> resources;
-    priority_queue<Request> requests; 
+    int food;    // Quantity of food available
+    int water;   // Quantity of water available
+    int medical; // Quantity of medical supplies available
 
 public:
+ 
     ResourceManagementSystem() {
-      
-        resources["food"] = 1000; 
-        resources["water"] = 1000; 
-        resources["medical"] = 500;
+        food = 1000;
+        water = 1000;
+        medical = 500;
     }
 
-    void addResources(string resourceName, int quantity) {
-        resources[resourceName] += quantity;
-        cout << "Added " << quantity << " units of " << resourceName << "." << endl;
+  
+    void addResources() {
+        int addFood, addWater, addMedical;
+        cout << "Enter the quantity of food to add: ";
+        cin >> addFood;
+        cout << "Enter the quantity of water to add: ";
+        cin >> addWater;
+        cout << "Enter the quantity of medical supplies to add: ";
+        cin >> addMedical;
+
+        food += addFood;
+        water += addWater;
+        medical += addMedical;
+
+        cout << "Resources added successfully!\n";
     }
 
-    
     void displayResources() {
         cout << "\nCurrent Resources:\n";
-        cout << "-------------------\n";
-        for (const auto& resource : resources) {
-            cout << setw(10) << resource.first << ": " << resource.second << " units\n";
-        }
-    }
-
-    void addRequest(const string& areaName, int priority, int food, int water, int medical) {
-        Request req = {areaName, priority, food, water, medical};
-        requests.push(req);
-        cout << "Request added for area: " << areaName << " with priority: " << priority << endl;
+        cout << "Food: " << food << " units\n";
+        cout << "Water: " << water << " units\n";
+        cout << "Medical Supplies: " << medical << " units\n";
     }
 
     void processRequest() {
-        if (requests.empty()) {
-            cout << "No pending requests to process.\n";
-            return;
-        }
+        int reqFood, reqWater, reqMedical;
+        cout << "Enter the quantity of food required: ";
+        cin >> reqFood;
+        cout << "Enter the quantity of water required: ";
+        cin >> reqWater;
+        cout << "Enter the quantity of medical supplies required: ";
+        cin >> reqMedical;
 
-        Request req = requests.top();
-        requests.pop();
-
-        cout << "\nProcessing request for area: " << req.areaName << " (Priority: " << req.priority << ")\n";
-
-        bool fulfilled = true;
-        if (resources["food"] >= req.food && resources["water"] >= req.water && resources["medical"] >= req.medical) {
-            resources["food"] -= req.food;
-            resources["water"] -= req.water;
-            resources["medical"] -= req.medical;
-        } else {
-            fulfilled = false;
-        }
-
-        if (fulfilled) {
-            cout << "Request fulfilled successfully.\n";
+        if (reqFood <= food && reqWater <= water && reqMedical <= medical) {
+            food -= reqFood;
+            water -= reqWater;
+            medical -= reqMedical;
+            cout << "Request fulfilled successfully!\n";
         } else {
             cout << "Insufficient resources to fulfill the request.\n";
         }
     }
-
-    // Show pending requests
-    void showPendingRequests() {
-        if (requests.empty()) {
-            cout << "No pending requests.\n";
-            return;
-        }
-
-        cout << "\nPending Requests:\n";
-        cout << "------------------\n";
-        priority_queue<Request> temp = requests; // Copy the queue to display
-        while (!temp.empty()) {
-            Request req = temp.top();
-            temp.pop();
-            cout << "Area: " << req.areaName << ", Priority: " << req.priority
-                 << ", Food: " << req.food << ", Water: " << req.water
-                 << ", Medical: " << req.medical << endl;
-        }
-    }
 };
 
-// Main function
 int main() {
     ResourceManagementSystem system;
 
     int choice;
-    while (true) {
+    do {
+        // Display the menu
         cout << "\nEmergency Resource Management System\n";
         cout << "-------------------------------------\n";
         cout << "1. Add Resources (Donations)\n";
         cout << "2. Display Resources\n";
-        cout << "3. Add Request\n";
-        cout << "4. Process Request\n";
-        cout << "5. Show Pending Requests\n";
-        cout << "6. Exit\n";
+        cout << "3. Process Request\n";
+        cout << "4. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
 
+        // Execute the user's choice
         switch (choice) {
-            case 1: {
-                string resourceName;
-                int quantity;
-                cout << "Enter resource name (food/water/medical): ";
-                cin >> resourceName;
-                cout << "Enter quantity: ";
-                cin >> quantity;
-                system.addResources(resourceName, quantity);
-                break;
-            }
-            case 2:
-                system.displayResources();
-                break;
-
-            case 3: {
-                string areaName;
-                int priority, food, water, medical;
-                cout << "Enter area name: ";
-                cin >> areaName;
-                cout << "Enter priority (lower number = higher priority): ";
-                cin >> priority;
-                cout << "Enter food units required: ";
-                cin >> food;
-                cout << "Enter water units required: ";
-                cin >> water;
-                cout << "Enter medical units required: ";
-                cin >> medical;
-                system.addRequest(areaName, priority, food, water, medical);
-                break;
-            }
-            case 4:
-                system.processRequest();
-                break;
-
-            case 5:
-                system.showPendingRequests();
-                break;
-
-            case 6:
-                cout << "Exiting system. Goodbye!\n";
-                return 0;
-
-            default:
-                cout << "Invalid choice! Please try again.\n";
+        case 1:
+            system.addResources();
+            break;
+        case 2:
+            system.displayResources();
+            break;
+        case 3:
+            system.processRequest();
+            break;
+        case 4:
+            cout << "Exiting the system. Goodbye!\n";
+            break;
+        default:
+            cout << "Invalid choice. Please try again.\n";
         }
-    }
+    } while (choice != 4);
 
     return 0;
 }
